@@ -1,16 +1,15 @@
-import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+"""Backward-compatible imports for the dedicated database package."""
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./bhoomi_rakshak.db")
+try:
+    from database import Base, DATABASE_URL, SessionLocal, engine, get_db, init_db
+except ModuleNotFoundError:
+    from ..database import Base, DATABASE_URL, SessionLocal, engine, get_db, init_db
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+__all__ = [
+    "Base",
+    "DATABASE_URL",
+    "SessionLocal",
+    "engine",
+    "get_db",
+    "init_db",
+]

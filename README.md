@@ -1,13 +1,16 @@
 # Bhoomi Rakshak 2.0 — Technical Architecture & Complete Working Guide
 
-> **Bhoomi Rakshak 2.0** — Advanced Next-Gen Edition
-> Repository: [vivekyadavoffline/BhoomiRakshak-2.0](https://github.com/vivekyadavoffline/BhoomiRakshak-2.0)
-> Upstream Origin: [dhruv-kwatra/BhoomiRakshak](https://github.com/dhruv-kwatra/BhoomiRakshak)
-> Lead Maintainer: Vivek Yadav (@vivekyadavoffline)
+> **Bhoomi Rakshak 2.0** — AI-assisted disaster-risk and relocation decision support
 
-**Bhoomi Rakshak** is an AI-assisted and geospatial disaster-risk mitigation, evacuation routing, and proactive relocation planning platform. It was created for **Smart India Hackathon 2026 (Problem Statement 26191)**.
+**Bhoomi Rakshak** is an AI-assisted geospatial disaster-risk mitigation, evacuation routing, and proactive relocation planning platform built for the AZINHACK '26 open-innovation round. It combines structured project knowledge with TinyFish live-web research when current external evidence is needed.
 
 The system empowers district disaster management authorities (DDMAs), state agencies (SDMAs), urban local bodies, and vulnerable citizens with explainable decision support, multi-modal GIS visualization, algorithmic evacuation routing, and economic justification modeling.
+
+## AZINHACK '26 Ready
+
+This repository includes a focused [AZINHACK '26 submission pack](AZINHACK_SUBMISSION.md) with the judging map, TinyFish integration explanation, timed demo flow, setup commands, and final submission checklist.
+
+TinyFish is integrated as a functional live-web research layer: the assistant checks internal Bhoomi Rakshak knowledge first, then uses TinyFish for current or uncovered disaster-risk questions. See [TINYFISH_README.md](TINYFISH_README.md) for the integration architecture and demo steps. The dedicated research workspace is available at `/intel`.
 
 ---
 
@@ -87,37 +90,38 @@ graph TD
 
 ### A. Technology Stack Mapping Matrix
 
-| Technology | Category | Where Used (File / Module) | What It Does (Role & Mechanics) |
-|---|---|---|---|
-| **React 19** | Frontend Framework | `src/App.jsx`, `src/pages/*.jsx`, `src/components/*.jsx` | Drives reactive component rendering, state isolation (`useState`, `useEffect`, `useMemo`), and concurrent UI transitions. |
-| **Vite** | Build Tool & Dev Server | `vite.config.js`, `package.json` | Powers instant sub-second Hot Module Replacement (HMR), tree-shaking, and optimized production bundle code-splitting. |
-| **React Router** | Client-side Routing | `src/App.jsx` | Enables seamless, deep-linkable multi-route SPA navigation across `/`, `/console`, `/citizen`, `/dashboard`, and fallback 404 views without page reloads. |
-| **Leaflet & React-Leaflet** | 2D Interactive GIS | `src/components/Map.jsx`, `src/pages/Website.jsx` | Renders interactive vector tile maps, polygon risk overlays, marker clusters, and animated Dijkstra evacuation polylines with click-to-fly zoom triggers. |
-| **Esri World Imagery** | Satellite GIS Layer | `src/components/Map.jsx`, `src/pages/Website.jsx` | Streams ultra-high-resolution satellite aerial basemaps allowing authorities and citizens to inspect real-world physical terrain, rivers, and slopes. |
-| **Three.js & React Three Fiber** | 3D WebGL Graphics | `src/components/Earth3D.jsx`, `src/pages/Website.jsx` | Raycasts 3D Digital Elevation Models (DEM), generates procedural contour topographies and geological fault lines with smooth orbital camera controls. |
-| **Recharts** | Data Visualization | `src/components/AnalyticsPanel.jsx`, `src/components/ReverseInsurance.jsx` | Renders responsive SVG charts (radar multi-factor distributions, priority curves, 10-year proactive vs. reactive cost-benefit trajectories). |
-| **Lucide React** | UI Iconography | All frontend pages & components | Supplies crisp, high-contrast SVG icons for hazard badges (flood, landslide, cyclone), transportation routes, accessibility buttons, and emergency lifelines. |
-| **Web Speech API** | Voice Synthesis (TTS) | `src/pages/Website.jsx` | Native browser speech synthesizer (`SpeechSynthesisUtterance`) that broadcasts spoken disaster advisories in English and हिन्दी (Hindi). |
-| **HTML5 Geolocation** | User Positioning | `src/pages/Website.jsx` | Extracts citizen latitude/longitude via `navigator.geolocation` to compute real-time Haversine distance to nearest hazard zones and designated relief shelters. |
-| **Vanilla CSS & Print CSS** | Styling & Document Engine | `src/index.css`, `src/App.css` | Implements glassmorphism UI, responsive dark/light color palettes, and pure `@media print` DOM isolation for single-page A4 PDF/paper export. |
-| **Axios** | HTTP Client | `src/services/api.js` | Dispatches asynchronous REST API calls to FastAPI endpoints (`/api/layers/*`, `/api/engine/*`, `/api/feedback`, `/api/model/retrain`). |
-| **FastAPI** | Backend REST API | `backend/app/main.py` | Asynchronous, high-throughput Python API server with automated OpenAPI/Swagger documentation, request validation, and routing. |
-| **Uvicorn** | ASGI Web Server | `backend/app/main.py` | Production-grade ASGI server delivering high-concurrency request handling on port `8000`. |
-| **SQLite** | Database Persistence | `bhoomi_rakshak.db`, `backend/app/database.py` | Zero-configuration, serverless, ACID-compliant local SQL database storing spatial boundaries, habitations, candidate sites, and logs. |
-| **SQLAlchemy ORM** | Data Modeling & Queries | `backend/app/models.py`, `backend/app/crud.py` | Python ORM mapping SQL tables to Python objects, managing relational foreign keys, transactions, and session connection pools. |
-| **GeoPandas & Shapely** | Geospatial Engine | `backend/app/engine.py`, `scripts/seed_data.py` | Computes geometric spatial intersections (`overlay`), coordinate transformations, polygon containment, and geospatial impedance matrices. |
-| **Pandas & NumPy** | Statistical Analysis | `backend/app/engine.py` | Executes vector demographic calculations, vulnerability index matrices, population exposure normalizations, and priority ranking. |
-| **ReportLab** | PDF Generation | `backend/app/pdf_gen.py` | Programmatically draws official government-style relocation certificates with seals, structured data tables, and SHA-256 tamper-evident hashes. |
-| **Pydantic** | Schema Validation | `backend/app/schemas.py` | Enforces strict JSON payload structure, type coercion, and schema verification for all incoming API requests and outgoing responses. |
-| **XGBoost & Scikit-learn** | Machine Learning NLP Engine | `backend/app/chatbot.py`, `backend/train_chatbot.py` | Gradient-boosted decision trees over TF-IDF n-gram text vectors classify queries into disaster mitigation intents with calibrated probabilities and automated keyword fallback. |
-| **Mobile-First CSS & Media Queries** | Responsive Layout Engine | `frontend/src/index.css`, `Website.jsx`, `Dashboard.jsx` | Delivers zero-overflow responsive geometry across 360px–980px+ viewports, reordering GIS maps ahead of lists on phones and sizing touch targets. |
-| **Python-dotenv** | Config Management | `backend/app/main.py` | Manages environment configurations securely from `.env` files. |
+| Technology                           | Category                    | Where Used (File / Module)                                                 | What It Does (Role & Mechanics)                                                                                                                                                 |
+| ------------------------------------ | --------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **React 19**                         | Frontend Framework          | `src/App.jsx`, `src/pages/*.jsx`, `src/components/*.jsx`                   | Drives reactive component rendering, state isolation (`useState`, `useEffect`, `useMemo`), and concurrent UI transitions.                                                       |
+| **Vite**                             | Build Tool & Dev Server     | `vite.config.js`, `package.json`                                           | Powers instant sub-second Hot Module Replacement (HMR), tree-shaking, and optimized production bundle code-splitting.                                                           |
+| **React Router**                     | Client-side Routing         | `src/App.jsx`                                                              | Enables seamless, deep-linkable multi-route SPA navigation across `/`, `/console`, `/citizen`, `/dashboard`, and fallback 404 views without page reloads.                       |
+| **Leaflet & React-Leaflet**          | 2D Interactive GIS          | `src/components/Map.jsx`, `src/pages/Website.jsx`                          | Renders interactive vector tile maps, polygon risk overlays, marker clusters, and animated Dijkstra evacuation polylines with click-to-fly zoom triggers.                       |
+| **Esri World Imagery**               | Satellite GIS Layer         | `src/components/Map.jsx`, `src/pages/Website.jsx`                          | Streams ultra-high-resolution satellite aerial basemaps allowing authorities and citizens to inspect real-world physical terrain, rivers, and slopes.                           |
+| **Three.js & React Three Fiber**     | 3D WebGL Graphics           | `src/components/Earth3D.jsx`, `src/pages/Website.jsx`                      | Raycasts 3D Digital Elevation Models (DEM), generates procedural contour topographies and geological fault lines with smooth orbital camera controls.                           |
+| **Recharts**                         | Data Visualization          | `src/components/AnalyticsPanel.jsx`, `src/components/ReverseInsurance.jsx` | Renders responsive SVG charts (radar multi-factor distributions, priority curves, 10-year proactive vs. reactive cost-benefit trajectories).                                    |
+| **Lucide React**                     | UI Iconography              | All frontend pages & components                                            | Supplies crisp, high-contrast SVG icons for hazard badges (flood, landslide, cyclone), transportation routes, accessibility buttons, and emergency lifelines.                   |
+| **Web Speech API**                   | Voice Synthesis (TTS)       | `src/pages/Website.jsx`                                                    | Native browser speech synthesizer (`SpeechSynthesisUtterance`) that broadcasts spoken disaster advisories in English and हिन्दी (Hindi).                                        |
+| **HTML5 Geolocation**                | User Positioning            | `src/pages/Website.jsx`                                                    | Extracts citizen latitude/longitude via `navigator.geolocation` to compute real-time Haversine distance to nearest hazard zones and designated relief shelters.                 |
+| **Vanilla CSS & Print CSS**          | Styling & Document Engine   | `src/index.css`, `src/App.css`                                             | Implements glassmorphism UI, responsive dark/light color palettes, and pure `@media print` DOM isolation for single-page A4 PDF/paper export.                                   |
+| **Axios**                            | HTTP Client                 | `src/services/api.js`                                                      | Dispatches asynchronous REST API calls to FastAPI endpoints (`/api/layers/*`, `/api/engine/*`, `/api/feedback`, `/api/model/retrain`).                                          |
+| **FastAPI**                          | Backend REST API            | `backend/app/main.py`                                                      | Asynchronous, high-throughput Python API server with automated OpenAPI/Swagger documentation, request validation, and routing.                                                  |
+| **Uvicorn**                          | ASGI Web Server             | `backend/app/main.py`                                                      | Production-grade ASGI server delivering high-concurrency request handling on port `8000`.                                                                                       |
+| **SQLite**                           | Database Persistence        | `bhoomi_rakshak.db`, `backend/app/database.py`                             | Zero-configuration, serverless, ACID-compliant local SQL database storing spatial boundaries, habitations, candidate sites, and logs.                                           |
+| **SQLAlchemy ORM**                   | Data Modeling & Queries     | `backend/app/models.py`, `backend/app/crud.py`                             | Python ORM mapping SQL tables to Python objects, managing relational foreign keys, transactions, and session connection pools.                                                  |
+| **GeoPandas & Shapely**              | Geospatial Engine           | `backend/app/engine.py`, `scripts/seed_data.py`                            | Computes geometric spatial intersections (`overlay`), coordinate transformations, polygon containment, and geospatial impedance matrices.                                       |
+| **Pandas & NumPy**                   | Statistical Analysis        | `backend/app/engine.py`                                                    | Executes vector demographic calculations, vulnerability index matrices, population exposure normalizations, and priority ranking.                                               |
+| **ReportLab**                        | PDF Generation              | `backend/app/pdf_gen.py`                                                   | Programmatically draws official government-style relocation certificates with seals, structured data tables, and SHA-256 tamper-evident hashes.                                 |
+| **Pydantic**                         | Schema Validation           | `backend/app/schemas.py`                                                   | Enforces strict JSON payload structure, type coercion, and schema verification for all incoming API requests and outgoing responses.                                            |
+| **XGBoost & Scikit-learn**           | Machine Learning NLP Engine | `backend/app/chatbot.py`, `backend/train_chatbot.py`                       | Gradient-boosted decision trees over TF-IDF n-gram text vectors classify queries into disaster mitigation intents with calibrated probabilities and automated keyword fallback. |
+| **Mobile-First CSS & Media Queries** | Responsive Layout Engine    | `frontend/src/index.css`, `Website.jsx`, `Dashboard.jsx`                   | Delivers zero-overflow responsive geometry across 360px–980px+ viewports, reordering GIS maps ahead of lists on phones and sizing touch targets.                                |
+| **Python-dotenv**                    | Config Management           | `backend/app/main.py`                                                      | Manages environment configurations securely from `.env` files.                                                                                                                  |
 
 ---
 
 ### B. Detailed Technology-by-Technology Breakdown
 
 #### 1. React 19 & Vite (Frontend Core)
+
 - **Where**: `frontend/src/App.jsx`, `frontend/src/pages/Website.jsx`, `frontend/src/pages/Dashboard.jsx`.
 - **What It Does**:
   - Manages deep UI state (active hazard zone, active filters, bilingual selection, scenario progress).
@@ -126,6 +130,7 @@ graph TD
   - Vite provides sub-second build times and HMR (Hot Module Replacement) during development.
 
 #### 2. Leaflet & Esri Satellite Layers (Geospatial Mapping)
+
 - **Where**: `frontend/src/components/Map.jsx`, `frontend/src/pages/Website.jsx`.
 - **What It Does**:
   - Renders multi-layer maps: OpenStreetMap (Standard), Esri High-Resolution World Imagery (Satellite), and Esri Topo (Terrain contours).
@@ -134,6 +139,7 @@ graph TD
   - Smooth camera panning with `map.flyTo([lat, lng], 13)` when any zone is clicked.
 
 #### 3. Three.js (3D Geological Terrain)
+
 - **Where**: `frontend/src/components/Earth3D.jsx`, `frontend/src/pages/Website.jsx`.
 - **What It Does**:
   - Creates a WebGL scene raycasting elevation heightmaps into a 3D terrain mesh.
@@ -141,6 +147,7 @@ graph TD
   - Allows full 3D camera orbital rotation, panning, and zooming.
 
 #### 4. Web Speech API (Bilingual Emergency Voice Synthesizer)
+
 - **Where**: `frontend/src/pages/Website.jsx`.
 - **What It Does**:
   - Utilizes browser native `window.speechSynthesis` with `SpeechSynthesisUtterance`.
@@ -148,6 +155,7 @@ graph TD
   - Animates dynamic CSS soundwave bars during speech playback.
 
 #### 5. FastAPI & Uvicorn (Backend API Service)
+
 - **Where**: `backend/app/main.py`.
 - **What It Does**:
   - Exposes RESTful endpoints for GIS layers, analytics scoring, citizen feedback, retraining, and PDF generation.
@@ -155,6 +163,7 @@ graph TD
   - Automatically generates interactive OpenAPI documentation at `/docs`.
 
 #### 6. SQLite & SQLAlchemy (Zero-Config Database)
+
 - **Where**: `backend/app/database.py`, `backend/app/models.py`, `backend/app/crud.py`.
 - **What It Does**:
   - Stores all persistent state in a single local database file (`bhoomi_rakshak.db`).
@@ -162,12 +171,14 @@ graph TD
   - Stores spatial geometries as GeoJSON text and queries them with zero external server dependencies.
 
 #### 7. GeoPandas & Shapely (Geospatial Engine)
+
 - **Where**: `backend/app/engine.py`, `scripts/seed_data.py`.
 - **What It Does**:
   - Converts GeoJSON database strings into `Shapely` geometric polygons (`Polygon`, `Point`, `MultiPolygon`).
   - Executes spatial overlays (`gpd.overlay(habs, hazards, how='intersection')`) to detect spatial overlaps between monitored settlements and active disaster hazard zones.
 
 #### 8. ReportLab (Cryptographic PDF Generation)
+
 - **Where**: `backend/app/pdf_gen.py`.
 - **What It Does**:
   - Programmatically constructs official A4 Government of India style relocation certificates.
@@ -184,7 +195,7 @@ This flowchart outlines the entire operational lifecycle from raw environmental 
 ```mermaid
 flowchart TD
     Start([Environmental Telemetry & Spatial Data]) --> DataIngest[SQLite & GeoPandas Ingestion]
-    
+
     subgraph AnalyticsEngine ["Core Geospatial Analytics Engine (FastAPI + Shapely)"]
         DataIngest --> Overlay[Spatial Overlay Intersection]
         Overlay --> HazardCalc[Hazard Intensity Calculation]
@@ -195,7 +206,7 @@ flowchart TD
         Phasing -->|> 500| PhaseRed[Phase: Immediate / Red Zone]
         Phasing -->|200 - 500| PhaseYellow[Phase: Short-Term / Yellow Zone]
         Phasing -->|<= 200| PhaseGreen[Phase: Medium-Term / Green Zone]
-        
+
         PhaseRed & PhaseYellow --> DijkstraRoute[Dijkstra Evacuation Routing with Hazard Impedance]
         PhaseRed & PhaseYellow --> CapacityAlloc[Greedy Carrying Capacity Site Allocation]
     end
@@ -233,7 +244,7 @@ flowchart TD
     A[Monitored Habitation Polygon] --> B[Spatial Intersect with Hazard Zones]
     C[Hazard Intensity Scale 1-10] --> B
     B --> D[Compute Cumulative Hazard Score H]
-    
+
     E[Habitation Demographics] --> F{Vulnerability Rule Evaluator}
     F -->|Elderly > 15%| V1[+2 Points]
     F -->|Disabled > 5%| V2[+2 Points]
@@ -265,11 +276,11 @@ flowchart TD
 flowchart TD
     Login[Authority Lands on /console] --> LoadZones[Fetch Top Ranked Zones from API/Data]
     LoadZones --> FilterPanel[Apply District / Phase / Severity Filters]
-    
+
     FilterPanel --> Selection[Select Target Vulnerable Zone]
     Selection --> MapFly[Smooth Camera Fly-To Zoom Level 13]
     Selection --> MultiModal[Switch Views: 2D GIS / 2D Matrix / 3D Raycasted Terrain]
-    
+
     Selection --> DetailAudit[Audit Zone Details Panel]
     DetailAudit --> XAI[Review Transparent XAI Rationale & Factor Breakdown]
     DetailAudit --> CapacityCheck{Capacity Check}
@@ -292,17 +303,17 @@ flowchart TD
     UserOpen[Citizen Opens /citizen on Mobile/Browser] --> GPS[Click 'Locate GPS']
     GPS --> HTML5Loc[Browser HTML5 Geolocation API]
     HTML5Loc --> NearestCalc[Calculate Haversine Distance to Registered Zones]
-    
+
     NearestCalc --> StatusDisplay[Display Citizen Risk Status Banner]
     StatusDisplay --> InDanger{Is User in Hazard Zone?}
-    
+
     InDanger -->|High/Critical Risk| RedAdvisory[Show Red Warning & Active Threat Type]
     InDanger -->|Safe/Low Risk| GreenAdvisory[Show Normal Status & Readiness Advice]
 
     RedAdvisory --> SafeHaven[Highlight Closest Safe Relief Shelter]
     SafeHaven --> EvacMap[Show Animated Dijkstra Evacuation Corridor]
     SafeHaven --> TravelTime[Display Walk/Drive Distance & Shelter Capacity]
-    
+
     UserOpen --> VoiceBtn[Click 'Listen Advisory']
     VoiceBtn --> LangCheck{Selected Language}
     LangCheck -->|English| TTSEng[Web Speech API: English Voice Stream]
@@ -347,6 +358,7 @@ flowchart LR
 The system uses a pure, local file-based **SQLite** database (`bhoomi_rakshak.db`) without external server overhead or container requirements.
 
 ### Why SQLite?
+
 - **Zero Configuration**: No external daemon, port management, or Docker dependencies needed.
 - **Portability**: Database runs as a single file on local disk with instant cold-start time.
 - **High Concurrency for Read Queries**: Supports multi-threaded reads via SQLAlchemy's `check_same_thread=False` engine pool.
@@ -354,15 +366,15 @@ The system uses a pure, local file-based **SQLite** database (`bhoomi_rakshak.db
 
 ### Database Schema
 
-| Table | Purpose | Key Attributes |
-|---|---|---|
-| `hazard_zones` | Spatial boundaries & hazard telemetry | `id`, `hazard_type`, `intensity` (1–10), `historical_casualties`, `geom` (GeoJSON) |
-| `habitations` | Community settlements & demographic vulnerability | `id`, `name`, `population`, `elderly_pct`, `disabled_pct`, `income_bracket`, `housing_quality`, `occupation_type`, `dependency_ratio`, `geom` |
-| `candidate_sites` | Evaluated relocation destinations | `id`, `name`, `max_capacity`, `water_availability`, `power_availability`, `sanitation`, `proximity_to_services`, `geom` |
-| `red_zones` | Algorithmic scoring output & action prioritization | `id`, `habitation_id`, `hazard_score`, `vulnerability_score`, `exposure_score`, `priority_score`, `phase` (Immediate/Short-Term/Medium-Term), `assigned_site_id`, `xai_explanation` |
-| `feedback` | Citizen ground truth observations & crowd reports | `id`, `red_zone_id`, `citizen_name`, `message`, `timestamp` |
-| `legal_certificates` | Generated official relocation certificates | `id`, `red_zone_id`, `pdf_hash`, `issue_date` |
-| `alert_emails` | Emergency notification subscriber lists | `id`, `email`, `created_at` |
+| Table                | Purpose                                            | Key Attributes                                                                                                                                                                      |
+| -------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hazard_zones`       | Spatial boundaries & hazard telemetry              | `id`, `hazard_type`, `intensity` (1–10), `historical_casualties`, `geom` (GeoJSON)                                                                                                  |
+| `habitations`        | Community settlements & demographic vulnerability  | `id`, `name`, `population`, `elderly_pct`, `disabled_pct`, `income_bracket`, `housing_quality`, `occupation_type`, `dependency_ratio`, `geom`                                       |
+| `candidate_sites`    | Evaluated relocation destinations                  | `id`, `name`, `max_capacity`, `water_availability`, `power_availability`, `sanitation`, `proximity_to_services`, `geom`                                                             |
+| `red_zones`          | Algorithmic scoring output & action prioritization | `id`, `habitation_id`, `hazard_score`, `vulnerability_score`, `exposure_score`, `priority_score`, `phase` (Immediate/Short-Term/Medium-Term), `assigned_site_id`, `xai_explanation` |
+| `feedback`           | Citizen ground truth observations & crowd reports  | `id`, `red_zone_id`, `citizen_name`, `message`, `timestamp`                                                                                                                         |
+| `legal_certificates` | Generated official relocation certificates         | `id`, `red_zone_id`, `pdf_hash`, `issue_date`                                                                                                                                       |
+| `alert_emails`       | Emergency notification subscriber lists            | `id`, `email`, `created_at`                                                                                                                                                         |
 
 ---
 
@@ -389,13 +401,16 @@ The engine identifies communities at risk using a deterministic, explainable mat
 $$\text{Priority Score} = \text{Hazard Intensity} \times \left(\frac{\text{Population Exposure}}{100}\right) \times \text{Vulnerability Index}$$
 
 #### Vulnerability Index Breakdown:
+
 The vulnerability index ($V \in [0, 10]$) aggregates social and infrastructural fragility:
+
 - Elderly population $> 15\% \rightarrow +2$ points
 - Persons with disabilities $> 5\% \rightarrow +2$ points
 - Kutcha / mud-thatch housing $\rightarrow +3$ points
 - Low-income bracket $\rightarrow +3$ points
 
 #### Phased Action Categorization:
+
 - **`Immediate` (Red Zone)**: Priority Score $> 500$ — Urgent structural/life-safety threat; immediate evacuation corridor activated.
 - **`Short-Term` (Yellow Zone)**: $200 < \text{Priority Score} \le 500$ — Elevated hazard threshold; site preparation and staged relocation required.
 - **`Medium-Term` (Green Safe Zone)**: $\text{Priority Score} \le 200$ — Low-risk receiving zone with intake capacity.
@@ -409,6 +424,7 @@ When multiple overlapping hazards affect a single habitation (e.g., riverine flo
 $$\text{Composite Risk} = \min\left(100, \; \text{Mean}(\text{Active Hazard Scores}) + \text{Overlap Bonus}\right)$$
 
 Where:
+
 - $\text{Overlap Bonus} = (\text{Number of Active Hazards} - 1) \times 12.5$
 
 ---
@@ -425,6 +441,7 @@ graph LR
 ```
 
 #### Hazard Impedance Weighting:
+
 Each transit edge between spatial nodes has an effective cost:
 
 $$W = \text{Geodesic Distance (km)} \times \text{Impedance Multiplier}$$
@@ -453,6 +470,7 @@ $$\text{Suitability Score} = \frac{1}{8} \sum_{i=1}^{8} \text{Factor Score}_i$$
 8. **Habitation Proximity**: Distance from original cultural and ancestral roots.
 
 **Classification**:
+
 - `80 – 100`: **Highly Suitable** (Fast-track clearance)
 - `60 – 79`: **Suitable with Improvements** (Requires infrastructure pre-requisites)
 - `< 60`: **Not Suitable** (Rejection / Alternative search)
@@ -524,28 +542,33 @@ Evacuation guidance adaptively branches based on zone classification:
 ## 7. Frontend Layer & Component Mechanics (React + Vite)
 
 ### Authority Planning Desk (`/console`)
+
 - **Ranked Red-Zone Ledger**: Dynamic pagination, multi-level district filtering, search by village name, and quick-fly map triggers.
 - **Live Decision Panel**: Explains priority formulas, vulnerability indicators, historical disaster event logs, and carrying capacity status.
 - **Print Isolation System**: Pure CSS `@media print` isolation that outputs clean single-page A4 administrative planning briefs and legal certificates without UI clipping.
 
 ### Citizen Resilience Portal (`/citizen`)
+
 - **Geolocation Snapping**: Uses browser HTML5 Geolocation API (`navigator.geolocation`) to find user coordinates and identify the nearest registered hazard zone and designated safe haven.
 - **SOS Speed-Dial Quick Strip**: Direct `tel:` mobile triggers to `112` (National Helpline), `1078` (NDRF), `1077` (DDMA), `108` (Ambulance), and `1070` (SDMA).
 - **Interactive 72-Hour Go-Bag Checklist**: Client-persisted checklist tracking emergency survival supplies.
 - **Citizen Ground Observation Hub**: Allows citizens to submit geo-tagged observations of ground cracks, slope fissures, and waterlogging.
 
 ### Interactive 3D Geological Terrain (`Terrain3D` / Three.js)
+
 - Renders high-fidelity digital elevation models (DEM) using WebGL via Three.js.
 - Generates procedural contour lines, geological fault lines, and interactive spatial pins with camera orbit fly-to animations.
 
 ### Tri-Tier Bilingual Voice Advisory (Web Speech API)
+
 - Implements browser native `window.speechSynthesis` with `SpeechSynthesisUtterance`.
 - Broadcasts context-aware voice advisories in **English** and **हिन्दी (Hindi)** with real-time waveform audio visualizers:
-  - **Red Alert Message**: *"Immediate evacuation alert for [Zone]. Please follow the designated Dijkstra evacuation corridor to safe haven."*
-  - **Yellow Alert Message**: *"Preparedness alert for [Zone]. The area is currently under close observation. Keep your 72-hour emergency go-bag ready."*
-  - **Green Reassurance Message**: *"You are in a safe zone at [Zone]. No immediate evacuation is required. Please remain calm."*
+  - **Red Alert Message**: _"Immediate evacuation alert for [Zone]. Please follow the designated Dijkstra evacuation corridor to safe haven."_
+  - **Yellow Alert Message**: _"Preparedness alert for [Zone]. The area is currently under close observation. Keep your 72-hour emergency go-bag ready."_
+  - **Green Reassurance Message**: _"You are in a safe zone at [Zone]. No immediate evacuation is required. Please remain calm."_
 
 ### Complete Mobile-First Responsive Design & Fluid Geometry
+
 - **Zero-Overflow Mobile Shield**: Global base rules (`overflow-x: hidden; width: 100%; max-width: 100vw; -webkit-text-size-adjust: 100%`) eliminate horizontal viewport scroll across all mobile browsers.
 - **Intelligent Overview Reordering**: On viewports $\le 980\text{px}$, CSS flex ordering places the **Interactive GIS Map / 3D Canvas first (`order: 1`)**, followed by the **Selected Zone Detail Panel (`order: 2`)**, and the **Zone List third (`order: 3`)** with a compact 180px–220px scroll limit.
 - **Mobile Map Control Grid**: The 4-mode map switcher (3D Globe, 2D GIS, 3D Terrain, 2D Grid) converts into a touch-friendly 2×2 wrapping grid.
@@ -559,26 +582,27 @@ Evacuation guidance adaptively branches based on zone classification:
 
 Base URL: `http://localhost:8000`
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/` | API health check — returns service status, version, and database info |
-| `GET` | `/api/zones` | Paginated, filterable pan-India zone listing (state, district, phase, search) |
-| `GET` | `/api/zones/{zone_id}` | Single zone detail by zone code (e.g. `K-ALA-05`) |
-| `GET` | `/api/districts` | Returns all seeded districts with coordinates and metadata |
-| `GET` | `/api/layers/hazards` | GeoJSON FeatureCollection of all active hazard polygon zones |
-| `GET` | `/api/layers/habitations` | GeoJSON FeatureCollection of all monitored habitations |
-| `GET` | `/api/layers/candidate-sites` | GeoJSON FeatureCollection of relocation candidate sites |
-| `POST` | `/api/engine/compute` | Executes the GeoPandas/Shapely spatial analytics scoring engine |
-| `POST` | `/api/engine/sync-live` | Syncs live weather feeds and triggers instant engine recalculation |
-| `GET` | `/api/red-zones` | Retrieves ranked red-zone listings with XAI explanations |
-| `POST` | `/api/feedback` | Ingests citizen ground reports and crowd observations |
-| `GET` | `/api/feedback` | Retrieves all logged citizen ground truth reports |
-| `POST` | `/api/model/retrain` | Calibrates hazard scoring weights dynamically based on reports |
-| `GET` | `/api/red-zones/{id}/certificate` | Compiles and streams a cryptographic PDF legal certificate |
-| `POST` | `/api/emails` | Registers an emergency subscriber email for CAP alerts |
-| `GET` | `/api/emails` | Lists registered emergency subscriber emails |
-| `POST` | `/api/alert` | Triggers broadcast email notifications for active hazard zones |
-| `POST` | `/api/chat` | AI Disaster Management Assistant query endpoint |
+| Method | Endpoint                          | Description                                                                   |
+| ------ | --------------------------------- | ----------------------------------------------------------------------------- |
+| `GET`  | `/`                               | API health check — returns service status, version, and database info         |
+| `GET`  | `/api/zones`                      | Paginated, filterable pan-India zone listing (state, district, phase, search) |
+| `GET`  | `/api/zones/{zone_id}`            | Single zone detail by zone code (e.g. `K-ALA-05`)                             |
+| `GET`  | `/api/districts`                  | Returns all seeded districts with coordinates and metadata                    |
+| `GET`  | `/api/layers/hazards`             | GeoJSON FeatureCollection of all active hazard polygon zones                  |
+| `GET`  | `/api/layers/habitations`         | GeoJSON FeatureCollection of all monitored habitations                        |
+| `GET`  | `/api/layers/candidate-sites`     | GeoJSON FeatureCollection of relocation candidate sites                       |
+| `POST` | `/api/engine/compute`             | Executes the GeoPandas/Shapely spatial analytics scoring engine               |
+| `POST` | `/api/engine/sync-live`           | Syncs live weather feeds and triggers instant engine recalculation            |
+| `GET`  | `/api/red-zones`                  | Retrieves ranked red-zone listings with XAI explanations                      |
+| `POST` | `/api/feedback`                   | Ingests citizen ground reports and crowd observations                         |
+| `GET`  | `/api/feedback`                   | Retrieves all logged citizen ground truth reports                             |
+| `POST` | `/api/model/retrain`              | Calibrates hazard scoring weights dynamically based on reports                |
+| `GET`  | `/api/red-zones/{id}/certificate` | Compiles and streams a cryptographic PDF legal certificate                    |
+| `POST` | `/api/emails`                     | Registers an emergency subscriber email for CAP alerts                        |
+| `GET`  | `/api/emails`                     | Lists registered emergency subscriber emails                                  |
+| `POST` | `/api/alert`                      | Triggers broadcast email notifications for active hazard zones                |
+| `POST` | `/api/chat`                       | AI Disaster Management Assistant query endpoint                               |
+| `POST` | `/api/tinyfish/search`            | Server-side TinyFish live-web search proxy                                    |
 
 Interactive Swagger documentation is available at `http://localhost:8000/docs`.
 
@@ -587,12 +611,14 @@ Interactive Swagger documentation is available at `http://localhost:8000/docs`.
 ## 9. Installation & Local Setup
 
 ### Prerequisites
+
 - **Node.js** (v18 or higher)
 - **Python** (v3.10 or higher)
 
 ---
 
 ### Step 1: Frontend Setup
+
 ```powershell
 # Navigate to the frontend directory
 cd frontend
@@ -606,6 +632,7 @@ npm install
 # Start Vite development server
 npm run dev
 ```
+
 The frontend is accessible at: **`http://localhost:5173`**
 
 > **Note**: The frontend includes a centralized API configuration (`src/services/apiConfig.js`) that auto-detects localhost vs production deployments. For local development, no `.env` changes are needed — it defaults to `http://localhost:8000`. The chatbot also has a built-in offline knowledge engine (`src/services/chatbotKnowledge.js`) that provides intelligent fallback responses when the backend API is unreachable.
@@ -613,6 +640,7 @@ The frontend is accessible at: **`http://localhost:5173`**
 ---
 
 ### Step 2: Backend Setup (SQLite)
+
 ```powershell
 # Navigate to the backend directory
 cd backend
@@ -627,21 +655,37 @@ pip install -r requirements.txt
 # Start FastAPI server with Uvicorn
 uvicorn app.main:app --reload --port 8000
 ```
+
 The backend API is accessible at: **`http://localhost:8000`**
 
 ---
 
 ### Step 3: Seed Pan-India Geospatial Data into SQLite
+
 To populate the SQLite database (`bhoomi_rakshak.db`) with **751+ habitations** across **67 districts** spanning all Indian states and union territories — including hazard zones, candidate relocation sites, and computed red zones:
+
 ```powershell
 python scripts/seed_india_data.py
 ```
 
 > **Note**: This replaces the older `scripts/seed_data.py` and seeds a comprehensive pan-India dataset with deterministic priority scoring, multi-hazard coverage (flood, landslide, cyclone, earthquake, coastal erosion), and matched relocation sites.
 
+### Step 4: JavaScript TinyFish fallback
+
+If Python is unavailable, run the Express proxy instead:
+
+```powershell
+cd backend/js-server
+npm install
+npm start
+```
+
+The proxy reads `TINYFISH_API_KEY` from `backend/.env` and serves the same `/api/tinyfish/search` endpoint on port `8000`. Never commit `backend/.env`; use `backend/.env.example` as the safe template.
+
 ---
 
 ## 🔒 Security & Privacy
+
 - **Client Data Isolation**: Geolocation is processed strictly in the user's browser session.
 - **Explainable AI**: No black-box automated evictions; all recommendations provide explicit mathematical factor breakdowns for human authority oversight.
 - **Tamper-Evident Certificates**: All generated legal relocation certificates embed SHA-256 verification hashes for administrative audit compliance.

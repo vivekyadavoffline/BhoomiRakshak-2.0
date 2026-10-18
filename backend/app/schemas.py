@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List, Any, Dict
 from datetime import datetime
 
@@ -108,3 +108,6 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     reply: str
+
+class TinyFishSearchRequest(BaseModel):
+    query: str = Field(min_length=2, max_length=500)

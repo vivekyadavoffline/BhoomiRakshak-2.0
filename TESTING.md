@@ -39,6 +39,9 @@ Open `http://localhost:5173` and verify:
 15. Citizen mode shows local risk context and alert controls.
 16. Citizen feedback accepts a category and appears in the feedback list.
 17. Authority certificate modal opens and print/save action works.
+18. Unified assistant answers documented Bhoomi Rakshak questions from internal knowledge without requiring TinyFish.
+19. Ask `What are the red zones in Delhi?` and verify local zone records plus TinyFish source cards appear.
+20. Open `/intel`, run a current India disaster-risk query, and verify readable source cards appear without raw CLI metadata.
 
 ## Backend and Database Checks
 
@@ -66,3 +69,4 @@ docker exec -it bhoomi_rakshak_backend bash -c "python /app/scripts/seed_data.py
 - Vite reports a large JavaScript bundle because the prototype includes Three.js, Leaflet, Recharts, and React in the main bundle. Code splitting is a future optimization.
 - The frontend currently contains synthetic planning data when the API is unavailable.
 - Full Docker validation requires Docker Desktop's engine to be running.
+- TinyFish checks require `backend/.env` with `TINYFISH_API_KEY` and either the Python or JavaScript backend running on port `8000`.

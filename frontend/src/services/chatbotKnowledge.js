@@ -64,6 +64,10 @@ export const BHOOMI_KNOWLEDGE = {
   help: {
     keywords: ["help", "contact", "support", "features", "what can you do", "how to use", "options", "menu"],
     reply: "I can answer questions regarding:\n• Priority Scoring Formula & Thresholds\n• Dynamic Evacuation Routing (Dijkstra)\n• Multi-Hazard Fusion Engine\n• Reverse Insurance & Economic ROI\n• Climate Fund Convergence (PMAY/JJM/NDMF)\n• Legal Relocation Certificates\n• Citizen Portal & 72h Go-Bag Checklist\n\nWhat would you like to explore?"
+  },
+  azinhack: {
+    keywords: ["azinhack", "online round", "finale", "prize pool", "unstop", "submission checklist", "team size", "social media post", "demo video", "tinyfish mandatory", "tinyfish points", "21-22 october", "18 october"],
+    reply: "AZINHACK '26 is an open-innovation hackathon by IoSC, GGSIPU East Delhi Campus. The online round runs until 18 October 2026, followed by the 2-day finale on 21-22 October at USAR, GGSIPU East Delhi Campus. TinyFish integration is mandatory and must be functional and relevant. Teams can build any real-world solution, with 1-4 members.\n\nJudging: working GitHub project 20, TinyFish integration 20, innovation 20, technique 10, impact 10, social post 10, and demo video 10. Submit a public GitHub repository, 2-3 minute demo showing TinyFish, public social post, and all links through Unstop."
   }
 };
 

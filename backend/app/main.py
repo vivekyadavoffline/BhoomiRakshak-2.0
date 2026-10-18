@@ -1,26 +1,41 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import os
+
 from fastapi import FastAPI, Depends, HTTPException, Response, Query
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from . import models, schemas, crud, engine, pdf_gen, email_service, chatbot, live_feeds
-from .database import engine as db_engine, get_db
-
-# Create DB tables
-models.Base.metadata.create_all(bind=db_engine)
+from .database import DATABASE_URL, SessionLocal, get_db, init_db
+from .tinyfish_service import TinyFishError, search_web
 
 app = FastAPI(title="Bhoomi Rakshak 2.0 API", description="National Disaster-Risk & Evacuation Intelligence Backend 2.0", version="2.0.0")
 
+cors_origins = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173",
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=cors_origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.on_event("startup")
+def startup_database():
+    init_db()
 
 @app.get("/")
 def read_root():
@@ -29,8 +44,32 @@ def read_root():
         "service": "Bhoomi Rakshak 2.0 National Geospatial Disaster Engine",
         "version": "2.0.0",
         "database": "SQLite (bhoomi_rakshak.db)",
-        "docs": "/docs"
+        "docs": "/docs",
+        "health": "/health",
     }
+
+@app.get("/health")
+def health_check():
+    database_status = "healthy"
+    database_error = None
+    db = SessionLocal()
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as error:
+        database_status = "unhealthy"
+        database_error = str(error)
+    finally:
+        db.close()
+
+    payload = {
+        "status": "ok" if database_status == "healthy" else "degraded",
+        "service": "bhoomi-rakshak-api",
+        "database": {"status": database_status, "url": DATABASE_URL.split("@")[-1]},
+        "tinyfish": {"configured": bool(os.getenv("TINYFISH_API_KEY"))},
+    }
+    if database_error:
+        payload["database"]["error"] = database_error
+    return payload
 
 @app.get("/api/zones", response_model=schemas.ZoneListResponse)
 def get_zones(
@@ -38,7 +77,7 @@ def get_zones(
     district: Optional[str] = Query(None, description="Filter by District"),
     phase: Optional[str] = Query(None, description="Filter by Phase (Immediate/Short-Term/Medium-Term)"),
     search: Optional[str] = Query(None, description="Search village, district, or code"),
-    limit: int = Query(1000, ge=1, le=5000),
+    limit: int = Query(10000, ge=1, le=10000),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db)
 ):
@@ -162,3 +201,13 @@ def chat_endpoint(request: schemas.ChatRequest):
     messages = [{"role": msg.role, "content": msg.content} for msg in request.messages]
     reply_content = chatbot.get_chat_response(messages)
     return {"reply": reply_content}
+
+@app.post("/api/tinyfish/search")
+def tinyfish_search(request: schemas.TinyFishSearchRequest):
+    query = request.query.strip()
+    if not query:
+        raise HTTPException(status_code=422, detail="Search query cannot be empty")
+    try:
+        return search_web(query)
+    except TinyFishError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
