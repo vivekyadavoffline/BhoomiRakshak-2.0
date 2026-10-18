@@ -14,11 +14,10 @@ export const cleanBaseUrl = (url) => {
 const isLocalhost = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-// In production (e.g. Vercel/Netlify), if VITE_API_URL is unset, do NOT default to localhost:8000
-// because it triggers browser Mixed Content blocks and connection refused errors.
+// In production (e.g. Vercel/Netlify), if VITE_API_URL is unset, default to the deployed Render backend
 export const API_BASE_URL = rawEnvUrl 
   ? cleanBaseUrl(rawEnvUrl) 
-  : (isLocalhost ? 'http://localhost:8000' : '');
+  : (isLocalhost ? 'http://localhost:8000' : 'https://bhoomirakshak-2-0.onrender.com');
 
 export const API_URL = API_BASE_URL ? `${API_BASE_URL}/api` : '/api';
 
