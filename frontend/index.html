@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bhoomi Rakshak 2.0 | Disaster Risk and Relocation Planning</title>
+    <meta name="description" content="Bhoomi Rakshak is a disaster-risk and relocation planning prototype. Combining hazard exposure, vulnerability, and relocation-site suitability." />
+    <meta name="keywords" content="disaster planning, relocation, hazard exposure, vulnerability, Bhoomi Rakshak" />
+    <meta name="author" content="Bhoomi Rakshak 2.0 Team (Vivek Yadav)" />
+    
+    <!-- Open Graph / Social Preview -->
+    <meta property="og:title" content="Bhoomi Rakshak | Disaster Risk and Relocation Planning" />
+    <meta property="og:description" content="Bhoomi Rakshak combines hazard exposure, vulnerability, and relocation-site suitability into one planning workflow." />
+    <meta property="og:image" content="/logo.jpg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://bhoomi-rakshak.example.com" />
+
+    <!-- Google tag (gtag.js) - Placeholder -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('SW registration failed: ', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

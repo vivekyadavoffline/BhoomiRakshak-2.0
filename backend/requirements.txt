@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+geopandas
+pandas
+shapely
+numpy
+scikit-learn
+reportlab
+pydantic
+pydantic-settings
+requests
+python-dotenv
+
+xgboost
